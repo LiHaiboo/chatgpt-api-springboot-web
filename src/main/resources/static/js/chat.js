@@ -49,7 +49,7 @@ function sendMessage() {
     sendButton.disabled = true;
     adjustInputHeight();
 
-    typingTimer = setInterval(typingWords, 50);
+    //typingTimer = setInterval(typingWords, 50);
 
     getAnswer(inputValue);
 }
@@ -75,6 +75,12 @@ function getAnswer(inputValue){
             if(result!=null) {
                 answerWords.push(result);
                 contentIdx += 1;
+
+                answers[qaIdx].innerHTML = marked.parse(result);
+                qaIdx += 1;
+                input.disabled = false;
+                sendButton.disabled = false;
+
             }
         } catch (error) {
             console.log(error);
