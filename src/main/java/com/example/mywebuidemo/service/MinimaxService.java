@@ -1,2 +1,4 @@
-package com.example.mywebuidemo.service;public class MinimaxService {
+package com.example.mywebuidemo.service;
+
+public class MinimaxService {
 }
