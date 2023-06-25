@@ -1,18 +1,45 @@
 const messagesContainer = document.getElementById('messages');
 const input = document.getElementById('input');
 const sendButton = document.getElementById('send');
-var qaIdx = 0,answers={},answerContent='',answerWords=[];
-var codeStart=false,lastWord='',lastLastWord='';
-var typingTimer=null,typing=false,typingIdx=0,contentIdx=0,contentEnd=false;
+var qaIdx = 0, answers = {}, answerContent = '', answerWords = [];
+var codeStart = false, lastWord = '', lastLastWord = '';
+var typingTimer = null, typing = false, typingIdx = 0, contentIdx = 0, contentEnd = false;
 
 //markdown解析，代码高亮设置
 marked.setOptions({
     highlight: function (code, language) {
         const validLanguage = hljs.getLanguage(language) ? language : 'javascript';
-        return hljs.highlight(code, { language: validLanguage }).value;
+        return hljs.highlight(code, {language: validLanguage}).value;
     },
 });
 
+function initializeChat() {
+    const inputValue = '您好，请自我介绍';
+
+    const question = document.createElement('div');
+    question.setAttribute('class', 'message question');
+    question.setAttribute('id', 'question-' + qaIdx);
+    question.innerHTML = marked.parse(inputValue);
+    messagesContainer.appendChild(question);
+
+    const answer = document.createElement('div');
+    answer.setAttribute('class', 'message answer');
+    answer.setAttribute('id', 'answer-' + qaIdx);
+    answer.innerHTML = marked.parse('AI思考中……');
+    messagesContainer.appendChild(answer);
+
+    answers[qaIdx] = document.getElementById('answer-' + qaIdx);
+
+    input.value = '';
+    input.disabled = true;
+    sendButton.disabled = true;
+    adjustInputHeight();
+
+    //typingTimer = setInterval(typingWords, 50);
+
+    getAnswer(inputValue);
+
+}
 
 //在输入时和获取焦点后自动调整输入框高度
 input.addEventListener('input', adjustInputHeight);
@@ -21,7 +48,7 @@ input.addEventListener('focus', adjustInputHeight);
 // 自动调整输入框高度
 function adjustInputHeight() {
     input.style.height = 'auto'; // 将高度重置为 auto
-    input.style.height = (input.scrollHeight+2) + 'px';
+    input.style.height = (input.scrollHeight + 2) + 'px';
 }
 
 function sendMessage() {
@@ -32,17 +59,17 @@ function sendMessage() {
 
     const question = document.createElement('div');
     question.setAttribute('class', 'message question');
-    question.setAttribute('id', 'question-'+qaIdx);
+    question.setAttribute('id', 'question-' + qaIdx);
     question.innerHTML = marked.parse(inputValue);
     messagesContainer.appendChild(question);
 
     const answer = document.createElement('div');
     answer.setAttribute('class', 'message answer');
-    answer.setAttribute('id', 'answer-'+qaIdx);
+    answer.setAttribute('id', 'answer-' + qaIdx);
     answer.innerHTML = marked.parse('AI思考中……');
     messagesContainer.appendChild(answer);
 
-    answers[qaIdx] = document.getElementById('answer-'+qaIdx);
+    answers[qaIdx] = document.getElementById('answer-' + qaIdx);
 
     input.value = '';
     input.disabled = true;
@@ -54,9 +81,14 @@ function sendMessage() {
     getAnswer(inputValue);
 }
 
-function getAnswer(inputValue){
+/*
+* 1. 向后端传值(目前是通过eventSource todo：简单带参数访问url)，后端调用api拿到答案
+* 2.  接收后端返回的answer/todo 接收后端主动返回的答案（较简单，JSP？java -> js）
+* 3. 添加到AnswerWords数组，结束
+* */
+function getAnswer(inputValue) {
     inputValue = encodeURIComponent(inputValue.replace(/\+/g, '{[$add$]}'));
-    const url = "/sse?inputValue="+inputValue;
+    const url = "/sse?inputValue=" + inputValue;
     const eventSource = new EventSource(url);
 
     eventSource.addEventListener("open", (event) => {
@@ -72,7 +104,7 @@ function getAnswer(inputValue){
             //     contentIdx += 1;
             // }
             var result = event.data;
-            if(result!=null) {
+            if (result != null) {
                 answerWords.push(result);
                 contentIdx += 1;
 
@@ -80,7 +112,7 @@ function getAnswer(inputValue){
                 qaIdx += 1;
                 input.disabled = false;
                 sendButton.disabled = false;
-
+                eventSource.close();
             }
         } catch (error) {
             console.log(error);
@@ -100,8 +132,8 @@ function getAnswer(inputValue){
 }
 
 
-function typingWords(){
-    if(contentEnd && contentIdx==typingIdx){
+function typingWords() {
+    if (contentEnd && contentIdx == typingIdx) {
         clearInterval(typingTimer);
         answerContent = '';
         answerWords = [];
@@ -117,25 +149,25 @@ function typingWords(){
         console.log((new Date().getTime()), 'typing end');
         return;
     }
-    if(contentIdx<=typingIdx){
+    if (contentIdx <= typingIdx) {
         return;
     }
-    if(typing){
+    if (typing) {
         return;
     }
     typing = true;
 
-    if(!answers[qaIdx]){
-        answers[qaIdx] = document.getElementById('answer-'+qaIdx);
+    if (!answers[qaIdx]) {
+        answers[qaIdx] = document.getElementById('answer-' + qaIdx);
     }
 
     const content = answerWords[typingIdx];
-    if(content.indexOf('`') != -1){
-        if(content.indexOf('```') != -1){
+    if (content.indexOf('`') != -1) {
+        if (content.indexOf('```') != -1) {
             codeStart = !codeStart;
-        }else if(content.indexOf('``') != -1 && (lastWord + content).indexOf('```') != -1){
+        } else if (content.indexOf('``') != -1 && (lastWord + content).indexOf('```') != -1) {
             codeStart = !codeStart;
-        }else if(content.indexOf('`') != -1 && (lastLastWord + lastWord + content).indexOf('```') != -1){
+        } else if (content.indexOf('`') != -1 && (lastLastWord + lastWord + content).indexOf('```') != -1) {
             codeStart = !codeStart;
         }
     }
@@ -144,7 +176,7 @@ function typingWords(){
     lastWord = content;
 
     answerContent += content;
-    answers[qaIdx].innerHTML = marked.parse(answerContent+(codeStart?'\n\n```':''));
+    answers[qaIdx].innerHTML = marked.parse(answerContent + (codeStart ? '\n\n```' : ''));
 
     typingIdx += 1;
     typing = false;
