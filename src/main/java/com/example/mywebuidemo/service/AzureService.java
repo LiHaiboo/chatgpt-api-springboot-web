@@ -7,6 +7,7 @@ import com.azure.ai.openai.models.ChatCompletionsOptions;
 import com.azure.ai.openai.models.ChatMessage;
 import com.azure.ai.openai.models.ChatRole;
 import com.azure.core.credential.AzureKeyCredential;
+import com.example.mywebuidemo.config.ApiKeyConfiguration;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,8 +18,6 @@ import java.util.Scanner;
 @Service
 public class AzureService {
     //input your own api key
-    private final String ENDPOINT = "https://agi-openai-3.openai.azure.com/";
-    private final String API_KEY = "a0bf2eeaf7494880a4cd767bfb49de1c";
 
     public String getAnswerFromMessages(OpenAIClient client, List<ChatMessage> chatMessages) {
         ChatCompletionsOptions option = new ChatCompletionsOptions(chatMessages);
@@ -30,8 +29,8 @@ public class AzureService {
     public void startChat() throws IOException {
 
         OpenAIClient client = new OpenAIClientBuilder()
-                .endpoint(ENDPOINT)
-                .credential(new AzureKeyCredential(API_KEY))
+                .endpoint(ApiKeyConfiguration.ENDPOINT)
+                .credential(new AzureKeyCredential(ApiKeyConfiguration.API_KEY))
                 .buildClient();
 
         List<ChatMessage> chatMessages = new ArrayList<>();

@@ -4,6 +4,7 @@ const sendButton = document.getElementById('send');
 var qaIdx = 0, answers = {}, answerContent = '', answerWords = [];
 var codeStart = false, lastWord = '', lastLastWord = '';
 var typingTimer = null, typing = false, typingIdx = 0, contentIdx = 0, contentEnd = false;
+var isMinimax = false;
 
 //markdown解析，代码高亮设置
 marked.setOptions({
@@ -40,6 +41,27 @@ function initializeChat() {
     getAnswer(inputValue);
 
 }
+
+/*
+* 开关控制
+*/
+document.getElementById("toggle").addEventListener("change",function() {
+    isMinimax = this.checked;
+
+    //清空聊天记录
+    for(let i = 0; i < qaIdx; i++) {
+        if(document.getElementById('question-'+i) != null) {
+            document.getElementById('question-'+i).remove()
+        }
+        if(document.getElementById('answer-'+i) != null) {
+            document.getElementById('answer-'+i).remove()
+        }
+
+    }
+
+    console.log(isMinimax);
+    initializeChat();
+});
 
 //在输入时和获取焦点后自动调整输入框高度
 input.addEventListener('input', adjustInputHeight);
@@ -87,8 +109,13 @@ function sendMessage() {
 * 3. 添加到AnswerWords数组，结束
 * */
 function getAnswer(inputValue) {
-    inputValue = encodeURIComponent(inputValue.replace(/\+/g, '{[$add$]}'));
-    const url = "/sse?inputValue=" + inputValue;
+    //inputValue = encodeURIComponent(inputValue.replace(/\+/g, '{[$add$]}'));
+    var url;
+    if(isMinimax) {
+        url = "/minimax?inputValue=" + inputValue;
+    } else {
+        url = "/sse?inputValue=" + inputValue;
+    }
     const eventSource = new EventSource(url);
 
     eventSource.addEventListener("open", (event) => {
@@ -121,6 +148,10 @@ function getAnswer(inputValue) {
 
     eventSource.addEventListener("error", (event) => {
         console.error("发生错误：", JSON.stringify(event));
+        console.log("连接已关闭", JSON.stringify(event.data));
+        eventSource.close();
+        contentEnd = true;
+        console.log((new Date().getTime()), 'answer end');
     });
 
     eventSource.addEventListener("close", (event) => {
@@ -180,4 +211,52 @@ function typingWords() {
 
     typingIdx += 1;
     typing = false;
+}
+
+function handleClick() {
+    var url;
+    if(isMinimax) {
+        url = '/minimaxSingle'
+    } else {
+        url = '/gptSingle'
+    }
+
+    fetch(url, {
+        method: 'POST', // or 'GET', 'PUT', 'DELETE', etc.
+        headers: {
+            'Content-Type': 'application/json' // set the appropriate content type
+        },
+        body: JSON.stringify({ uuid: '9decc5d0-9b94-4e10-92f8-8d2e531f791a' }) // include the data to send in the request body
+    })
+        //.then(response => response.json())
+        .then(data => {
+            // handle the response from the backend
+            console.log(data);
+        })
+        .catch(error => {
+            // handle any errors that occurred during the request
+            console.error('Error:', error);
+        });
+
+
+    //创建聊天框
+    const question = document.createElement('div');
+    question.setAttribute('class', 'message question');
+    question.setAttribute('id', 'question-' + qaIdx);
+    question.innerHTML = marked.parse('商品数据已发送');
+    messagesContainer.appendChild(question);
+
+    const answer = document.createElement('div');
+    answer.setAttribute('class', 'message answer');
+    answer.setAttribute('id', 'answer-' + qaIdx);
+    answer.innerHTML = marked.parse('宝你真有眼光，想知道什么关于这件宝贝的吗？');
+    messagesContainer.appendChild(answer);
+
+    answers[qaIdx] = document.getElementById('answer-' + qaIdx);
+
+    contentIdx += 1;
+    qaIdx += 1;
+
+
+
 }

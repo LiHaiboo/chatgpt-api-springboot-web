@@ -3,17 +3,148 @@ body {
     margin: 0;
     padding: 0;
 }
+.toggle, .toggle:before, .slot__label, .curtain {
+    transition-property: background-color, transform, visibility;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-in, cubic-bezier(0.6,0.2,0.4,1.5), linear;
+}
+.toggle:before, .slot, .slot__label {
+    display: block;
+}
+.toggle:before, .curtain {
+    position: absolute;
+}
+/*.toggle:checked, .curtain {*/
+/*    background-color:#c3c6cb;*/
+/*}*/
+.toggle:focus {
+    outline: transparent;
+}
+.toggle {
+    border-radius: 0.75em;
+    box-shadow: 0 0 0 0.1em inset;
+    cursor: pointer;
+    position: relative;
+    left: 4%;
+    top: 5px;
+    margin-right: 0.25em;
+    width: 3em;
+    height: 1.5em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+}
+.toggle:before {
+    background: currentColor;
+    border-radius: 50%;
+    content: "";
+    top: 0.2em;
+    left: 0.2em;
+    width: 1.1em;
+    height: 1.1em;
+}
+.toggle:checked:before {
+    transform: translateX(1.5em);
+}
+.toggle:checked ~ .slot .slot__label, .slot__label:nth-child(2) {
+    transform: translateY(-50%) scaleY(0);
+}
+.toggle:checked ~ .slot .slot__label:nth-child(2) {
+    transform: translateY(-100%) scaleY(1);
+}
+.toggle:checked ~ .curtain {
+    transform: scaleX(1);
+}
+.slot {
+    /*color: transparent;*/
+    position: relative;
+    left: 2%;
+    font-size: 1.5em;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    overflow: hidden;
+    height: 1em;
+    -webkit-text-stroke: 0.05em rgba(0, 0, 0, 0);
+}
+.slot__label {
+    transform-origin: 50% 0;
+}
+.slot__label:nth-child(2) {
+    transform-origin: 50% 100%;
+}
+.curtain {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    z-index: -1;
+}
+.button-28 {
+    position: relative;
+    top: 500px;
+    left: 20px;
+    appearance: none;
+    background-color: transparent;
+    border: 2px solid #1A1A1A;
+    border-radius: 15px;
+    box-sizing: border-box;
+    color: #3B3B3B;
+    cursor: pointer;
+    display: inline-block;
+    font-family: Roobert,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    font-size: 16px;
+    font-weight: 600;
+    line-height: normal;
+    margin: 0;
+    min-height: 60px;
+    min-width: 0;
+    outline: none;
+    padding: 16px 24px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: 10%;
+    height: 8%;
+    will-change: transform;
+}
+
+.button-28:disabled {
+    pointer-events: none;
+}
+
+.button-28:hover {
+    color: #fff;
+    background-color: #1A1A1A;
+    box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+    transform: translateY(-2px);
+}
+
+.button-28:active {
+    box-shadow: none;
+    transform: translateY(0);
+}
 
 #app {
+    position: sticky;
+    bottom: 0;
     display: flex;
     flex-direction: column;
     height: 100vh;
-    max-width: 900px;
+    max-width: 800px;
     margin: 0 auto;
+    border-radius: 10px 10px 10px 10px;
 }
 
 #app, .message.question, .input-area{
-    background-color: #f3f6fc;
+    /*background-color: #f3f6fc;*/
+    border: 3px solid black;
 }
 
 .messages-container {
@@ -26,7 +157,7 @@ body {
 .message{
     width: 100%;
     padding: 10px 20px;
-    border:solid 1px #c3c6cb;
+    border:3px solid black;
     box-sizing: border-box;
     background-color: white;
 }

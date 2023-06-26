@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Stream Demo by @qiayue</title>
+    <title>Chat Stream Demo by @haibo</title>
     <link rel="stylesheet" href="/css/monokai-sublime.css">
     <link rel="stylesheet" href="/css/chat.css?v=03240800">
     <link rel="shortcut icon" href="favicon.ico"/>
 </head>
 <body onload="initializeChat()">
+    <input id="toggle" class="toggle" type="checkbox" role="switch" name="toggle" value="on">
+    <label for="toggle" class="slot">
+        <span class="slot__label">GPT模型</span>
+        <span class="slot__label">MINIMAX模型</span>
+    </label>
+    <button class="button-28" role="button" onclick="handleClick()">时尚休闲连帽卫衣</button>
 <div id="app">
     <div class="messages-container">
         <div id="messages"></div>
