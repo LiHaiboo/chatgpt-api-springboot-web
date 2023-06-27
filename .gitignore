@@ -28,6 +28,7 @@ target/
 build/
 ApiKeyConfiguration
 src/main/java/com/example/mywebuidemo/config/
+/src/main/java/com/example/mywebuidemo/config/
 
 !**/src/main/**/build/
 !**/src/test/**/build/
