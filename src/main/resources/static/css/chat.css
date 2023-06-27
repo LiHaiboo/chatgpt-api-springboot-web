@@ -83,9 +83,14 @@ body {
     transform-origin: 0 50%;
     z-index: -1;
 }
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 .button-28 {
     position: relative;
-    top: 500px;
+    top: 20px;
     left: 20px;
     appearance: none;
     background-color: transparent;

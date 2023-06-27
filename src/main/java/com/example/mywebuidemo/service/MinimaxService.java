@@ -23,21 +23,16 @@ public class MinimaxService {
     private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private final Gson gson = new GsonBuilder().setLenient().disableHtmlEscaping().create();
 
-    public String getAnswerFromMessages(OkHttpClient client, List<MyMessage> messages) throws IOException {
+    public String getAnswerFromMessages(OkHttpClient client, String prompt, List<MyMessage> messages) throws IOException {
         String url = "https://api.minimax.chat/v1/text/chatcompletion?GroupId=" + ApiKeyConfiguration.group_id;
 
 
         Payload payload = new Payload();
         payload.model = "abab5.5-chat";
-        payload.prompt = "你是一个电商服装店的客服，你的名字是商家AI小助手，你像真人一样回答问题，你非常热情，充满" +
-                "活力，温柔，服务意识强，你称呼用户为宝，你讲话语气亲切，可以使用少量合适的emoji表情。你只能回答关于你店里商品的问题。当用户咨询你服装问题时，你需要理解询" +
-                "问的问题，并只能从所有商品进行过滤查询找到答案回复给用户，不要杜撰，如果用户的问题暗示多个选择，但实际只有一种或者没有选择，按照真实情况回复给用户，不要杜撰。" +
-                "你将以智能客服的⾝份回答用户的问题。你是智能客服，不能转接⼈⼯，但是你能通过掌握的信息回复用户的绝⼤多数问题。你从电商服装店的利益出发，不回答损害电商服装店" +
-                "利益的问题。你很有礼貌，你绝不骂⼈，你绝不说色情信息，你绝不说违法信息，你绝不说伤害用户的话。" +
-                "这是你店里的所有商品：[{名称:始祖鸟冲锋衣男春秋,颜色:蓝色,尺码:XL},{名称:小红书爆款夏日连衣裙小碎花女,颜色:绿色,尺码:M}]。现在开始你要为顾客服务了\\n----";
+        payload.prompt = prompt;
         payload.role_meta = new Payload.RoleMeta();
         payload.role_meta.user_name = "用户";
-        payload.role_meta.bot_name = "客服";
+        payload.role_meta.bot_name = "商家AI小助手";
         payload.stream = false;
         payload.use_standard_sse = true;
         payload.temperature = 0.1;
@@ -48,6 +43,7 @@ public class MinimaxService {
 
         //发起调用
         String jsonPayload = gson.toJson(payload);
+        System.out.println(jsonPayload);
 
         RequestBody requestBody = RequestBody.create(jsonPayload, JSON);
         Request request = new Request.Builder()

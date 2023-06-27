@@ -15,7 +15,7 @@ marked.setOptions({
 });
 
 function initializeChat() {
-    const inputValue = '您好，请自我介绍';
+    const inputValue = '哈喽！（此问题仅用于demo演示）';
 
     const question = document.createElement('div');
     question.setAttribute('class', 'message question');
@@ -213,7 +213,7 @@ function typingWords() {
     typing = false;
 }
 
-function handleClick() {
+function handleClick(uid) {
     var url;
     if(isMinimax) {
         url = '/minimaxSingle'
@@ -226,7 +226,7 @@ function handleClick() {
         headers: {
             'Content-Type': 'application/json' // set the appropriate content type
         },
-        body: JSON.stringify({ uuid: '9decc5d0-9b94-4e10-92f8-8d2e531f791a' }) // include the data to send in the request body
+        body: JSON.stringify({ uuid:  uid}) // include the data to send in the request body
     })
         //.then(response => response.json())
         .then(data => {
@@ -243,13 +243,13 @@ function handleClick() {
     const question = document.createElement('div');
     question.setAttribute('class', 'message question');
     question.setAttribute('id', 'question-' + qaIdx);
-    question.innerHTML = marked.parse('商品数据已发送');
+    question.innerHTML = marked.parse('发送商品数据（此消息仅用于demo演示）');
     messagesContainer.appendChild(question);
 
     const answer = document.createElement('div');
     answer.setAttribute('class', 'message answer');
     answer.setAttribute('id', 'answer-' + qaIdx);
-    answer.innerHTML = marked.parse('宝你真有眼光，想知道什么关于这件宝贝的吗？');
+    answer.innerHTML = marked.parse('模型已收到商品数据');
     messagesContainer.appendChild(answer);
 
     answers[qaIdx] = document.getElementById('answer-' + qaIdx);
