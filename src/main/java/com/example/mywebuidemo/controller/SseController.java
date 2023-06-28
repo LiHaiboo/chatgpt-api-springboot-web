@@ -45,6 +45,8 @@ public class SseController {
 
     private String promptForMinimax;
 
+    private OpenAIClient openAiClient;
+
     private final String staticPrompt = "你是一个电商服装店的客服，你的名字是商家AI小助手，你像真人一样回答问题，你非常热情，充满" +
             "活力，温柔，服务意识强，你称呼用户为宝，你讲话语气亲切，可以使用少量合适的emoji表情。你只能回答关于你店里商品的问题。当用户咨询你服装问题时，你需要理解询" +
             "问的问题，并只能从所有商品进行过滤查询找到答案回复给用户，不要杜撰，如果用户的问题暗示多个选择，但实际只有一种或者没有选择，按照真实情况回复给用户，不要杜撰。" +
@@ -55,7 +57,9 @@ public class SseController {
             "用户：“t恤是否还有白色XL款？”\n" +
             "你：“宝，白色XL码库存充足呦，如果喜欢的话可以放心下单哦～”\n" +
             "用户：“如果衣服拿到后有问题想换可以免费换吗？”\n" +
-            "你：“宝，商品是有运费险的，如果衣服有任何不满意，都是可以七天无理由退换货的\uD83D\uDE4B”\n";
+            "你：“宝，商品是有运费险的，如果衣服有任何不满意，都是可以七天无理由退换货的\uD83D\uDE4B”\n" +
+            "用户：“哈喽”\n" +
+            "你：“哈喽，我是商家AI小助手，请问宝有什么需要帮助的～”\n-----------\n";
 
 //    @RequestMapping("/")
 //    public String indexPageHandler() {
@@ -77,17 +81,21 @@ public class SseController {
         nonBlockingService.execute(() -> {
             try {
                 //inputValue -> request -> api -> response
-                OpenAIClient client = new OpenAIClientBuilder()
-                        .endpoint(ApiKeyConfiguration.ENDPOINT)
-                        .credential(new AzureKeyCredential(ApiKeyConfiguration.API_KEY))
-                        .buildClient();
+                if(openAiClient == null) {
+                    openAiClient = new OpenAIClientBuilder()
+                            .endpoint(ApiKeyConfiguration.ENDPOINT)
+                            .credential(new AzureKeyCredential(ApiKeyConfiguration.API_KEY))
+                            .buildClient();
+                }
+
                 if (chatMessages == null || chatMessages.isEmpty()) {
                     chatMessages = new ArrayList<>();
                     chatMessages.add(new ChatMessage(ChatRole.SYSTEM).setContent(staticPrompt));
                 }
                 chatMessages.add(new ChatMessage(ChatRole.USER).setContent(inputValue));
-                System.out.println(chatMessages);
-                String answer = azureService.getAnswerFromMessages(client, chatMessages);
+                //System.out.println(chatMessages.get(0).getContent());
+                //System.out.println(chatMessages);
+                String answer = azureService.getAnswerFromMessages(openAiClient, chatMessages);
                 chatMessages.add(new ChatMessage(ChatRole.ASSISTANT).setContent(answer));
                 emitter.send(answer.replaceAll("\\n", ""));
             } catch (IOException e) {
@@ -149,7 +157,7 @@ public class SseController {
         String prompt = staticPrompt + "接下来你要回答关于这个商品的问题，请基于给到你的数据回答用户的问题，商品数据如下：" + detailedData;
 
         //清空之前的gpt请求，重新装配
-        chatMessages.clear();
+        chatMessages = new ArrayList<>();
         chatMessages.add(new ChatMessage(ChatRole.SYSTEM).setContent(prompt));
 
         // 返回 JSON 响应
@@ -168,7 +176,8 @@ public class SseController {
         promptForMinimax = staticPrompt + "接下来你要回答关于这个商品的问题，请基于给到你的数据回答用户的问题，商品数据如下：" + detailedData;
 
         //清空之前的请求
-        myMessages.clear();
+        //myMessages.clear();
+        myMessages = new ArrayList<>();
 
         // 返回 JSON 响应
         return "OK";

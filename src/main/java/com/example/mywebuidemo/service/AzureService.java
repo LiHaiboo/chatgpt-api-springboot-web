@@ -21,8 +21,12 @@ public class AzureService {
 
     public String getAnswerFromMessages(OpenAIClient client, List<ChatMessage> chatMessages) {
         ChatCompletionsOptions option = new ChatCompletionsOptions(chatMessages);
-        option.setTemperature(0.1).setMaxTokens(4096);
+        option.setTemperature(0.01).setMaxTokens(4096);
         ChatCompletions chatCompletions = client.getChatCompletions("gpt35", option);
+        System.out.println(chatCompletions.getChoices().get(0).getMessage().getContent() + "\n" +
+                            "total tokens:" + chatCompletions.getUsage().getTotalTokens() + "\n" +
+                            "completion tokens:" + chatCompletions.getUsage().getCompletionTokens() + "\n" +
+                            "prompt tokens:" + chatCompletions.getUsage().getPromptTokens());
         return chatCompletions.getChoices().get(0).getMessage().getContent();
     }
 

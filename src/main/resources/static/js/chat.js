@@ -15,12 +15,12 @@ marked.setOptions({
 });
 
 function initializeChat() {
-    const inputValue = '哈喽！（此问题仅用于demo演示）';
+    const inputValue = '哈喽！';
 
     const question = document.createElement('div');
     question.setAttribute('class', 'message question');
     question.setAttribute('id', 'question-' + qaIdx);
-    question.innerHTML = marked.parse(inputValue);
+    question.innerHTML = marked.parse('哈喽！（此问题仅用于demo演示）');
     messagesContainer.appendChild(question);
 
     const answer = document.createElement('div');
